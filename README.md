@@ -61,6 +61,17 @@ For a free verifier, the repo includes a Cloudflare Worker + D1 scaffold in `clo
 - Cloudflare Workers has a free plan, and D1 fits the single-row activation lookup pattern well.
 - `schema.sql` creates the license and activation tables.
 - `src/index.ts` exposes `/v1/activate`, `/v1/verify`, `/v1/deactivate`, and `/v1/admin/issue`.
+- The current Worker is deployed at `https://aether-license.noorhusnain791.workers.dev`; its health check is `/health`. Its D1 database binding is configured in `wrangler.toml`.
+- The Worker admin secret is generated locally and stored in the current Windows user's Credential Manager through Python `keyring` under service `Aether Cloudflare` and username `license-admin-key`. It is not in the repository or desktop app. Retrieve it into the current PowerShell session only when issuing a key, then clear the environment variable:
+
+  ```powershell
+  $env:AETHER_LICENSE_URL = "https://aether-license.noorhusnain791.workers.dev"
+  $env:AETHER_ADMIN_KEY = & "E:\AetherPyEnv\Scripts\python.exe" -c "import keyring; print(keyring.get_password('Aether Cloudflare', 'license-admin-key') or '')"
+  if (-not $env:AETHER_ADMIN_KEY) { throw "The Aether Worker admin secret is missing from Windows Credential Manager." }
+  .\scripts\issue_license.ps1 -Note "Customer"
+  Remove-Item Env:AETHER_ADMIN_KEY
+  ```
+
 - No previous Cloudflare account is required. Create/sign in to the new Cloudflare account you want to use, then authenticate Wrangler in a PowerShell terminal:
 
   ```powershell

@@ -5,4 +5,4 @@ compatibility_date = "2026-08-06"
 [[d1_databases]]
 binding = "LICENSE_DB"
 database_name = "aether-license-db"
-database_id = "REPLACE_WITH_NEW_CLOUDFLARE_D1_DATABASE_ID"
+database_id = "a4ca51cc-d2c7-4f92-af61-68bbfb656980"
