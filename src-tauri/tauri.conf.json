@@ -52,10 +52,10 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://github.com/aether-desktop/aether/releases/latest/download/latest.json"
+        "https://github.com/zehra4088194-design/aether/releases/latest/download/latest.json"
       ],
       "dialog": false,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI2N0M1RTI5QzM4RUIxMTEKUldRUnNZN0RLVjU4Smk4ZEZxM0t6L3A1ZEJoSzBITVR1RkVPK0dGU1hYNzl0dzFicVZhWm5sOFAK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE4NUNGMzQyQkE5QkEwNUEKUldSYW9KdTZRdk5jcU56TXk5UkMvYjhuTFhZKzR5aGh6Zk9YNTlqRllUTG4wL3FpdlN5ODBJbzgK"
     }
   }
 }

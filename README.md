@@ -138,7 +138,7 @@ Low-space system drives can redirect transient Rust/PyInstaller output to anothe
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build_desktop.ps1 -Python "D:\AetherBuildEnv\Scripts\python.exe" -BuildRoot "D:\AetherBuild" -CargoTargetDir "D:\AetherTarget"
 ```
 
-By default, outputs are written under `src-tauri\target\release\bundle`; when `-CargoTargetDir` is supplied they are written beneath that target directory instead. The updater public key is committed; its private key is ignored under `.aether-data` and its password is stored in Windows Credential Manager. On a release machine, set `TAURI_SIGNING_PRIVATE_KEY_PATH` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`. Replace the example GitHub release endpoint in `src-tauri/tauri.conf.json` and `aether.config.yaml` before publishing under a real repository.
+By default, outputs are written under `src-tauri\target\release\bundle`; when `-CargoTargetDir` is supplied they are written beneath that target directory instead. The updater is configured for this repository's GitHub Releases. Publish the signed `latest.json` and updater bundles there to enable in-app updates. The updater public key is committed; its private key is ignored under `.aether-data` and its password is stored in Windows Credential Manager. On a release machine, set `TAURI_SIGNING_PRIVATE_KEY_PATH` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
 
 ## Architecture guardrails
 
