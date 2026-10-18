@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Aether",
+  "version": "0.1.0",
+  "identifier": "ai.aether.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Aether · Adaptive desktop intelligence",
+        "width": 1540,
+        "height": 960,
+        "minWidth": 1120,
+        "minHeight": 720,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": false,
+        "backgroundColor": "#0E1116"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' http://127.0.0.1:* ws://127.0.0.1:* http://ipc.localhost https://ipc.localhost; img-src 'self' asset: data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self';"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi", "nsis"],
+    "createUpdaterArtifacts": true,
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ],
+    "externalBin": ["binaries/aether-backend"],
+    "resources": ["resources/ms-playwright/**/*", "resources/piper-voices/**/*"],
+    "category": "Productivity",
+    "shortDescription": "Private, adaptive AI desktop assistant",
+    "longDescription": "Aether combines local-first voice, vision, browser and coding tools with adaptive hardware-aware performance.",
+    "windows": {
+      "wix": { "language": "en-US" },
+      "nsis": { "installMode": "currentUser" }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://github.com/aether-desktop/aether/releases/latest/download/latest.json"
+      ],
+      "dialog": false,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI2N0M1RTI5QzM4RUIxMTEKUldRUnNZN0RLVjU4Smk4ZEZxM0t6L3A1ZEJoSzBITVR1RkVPK0dGU1hYNzl0dzFicVZhWm5sOFAK"
+    }
+  }
+}

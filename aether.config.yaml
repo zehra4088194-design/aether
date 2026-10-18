@@ -1,0 +1,85 @@
+# Aether sample configuration. All optional perception/storage starts disabled.
+# Never put a real API key in this file; the UI stores keys in Credential Manager.
+
+app:
+  name: "Aether"
+  wake_word: "Hey Aether"
+  first_run_complete: false
+
+performance:
+  tier_override: null        # null = auto | lite | balanced | performance
+
+llm:
+  mode: "local_preferred"   # cloud_preferred | local_preferred | cloud_only | local_only
+  cloud:
+    provider: "anthropic"
+    model: "claude-sonnet-4-6"
+    api_key_env_var: "ANTHROPIC_API_KEY"
+  local:
+    ollama_host: "http://localhost:11434"
+    model_override: null
+
+# The Models screen owns these entries. They may reference an environment
+# variable, but plaintext secrets are rejected by ConfigManager.
+models:
+  default_id: null
+  entries: []
+
+vision:
+  local_model: "llava:7b"
+
+voice:
+  active_profile_id: "amara"
+  global_hotkey: "ctrl+alt+space"
+  wake_word_engine: "openwakeword"
+  wakeword_model_path: null
+  elevenlabs_voice_id: ""
+  stt_model_override: null
+  tts_engine: "piper"
+  speak_responses: false
+
+persona:
+  assistant_name: "Aether"
+  user_name: ""
+  style: "warm, concise, transparent"
+  languages: ["English", "Urdu", "Roman Urdu"]
+
+privacy:
+  consent_completed: false
+  voice_recording: false
+  camera_vision: false
+  screen_vision: false
+  browsing_history: false
+  memory_storage: false
+  telemetry: false
+
+diagnostics:
+  enabled: false
+
+plugins:
+  file_automation: true
+  browser_automation: true
+  voice: false
+  coding_agent: false
+  memory: false
+  camera_vision: false
+  proactive_engine: false
+  trading: false
+  productivity: true
+  visual_intelligence: true
+
+memory:
+  vector_store: "chroma"
+  max_items_override: null
+
+sub_agents:
+  max_parallel: 4
+
+ui:
+  theme: "aether"
+  high_contrast: false
+  reduced_motion: false
+
+updates:
+  enabled: true
+  manifest_url: "https://github.com/aether-desktop/aether/releases/latest/download/latest.json"

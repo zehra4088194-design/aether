@@ -1,0 +1,11 @@
+# Lightweight foundation/API set for development without optional voice/vision models.
+psutil>=5.9
+nvidia-ml-py>=12.0
+requests>=2.31
+PyYAML>=6.0
+keyring>=24.0
+fastapi>=0.116
+uvicorn[standard]>=0.35
+pydantic>=2.11
+pytest>=8.3
+httpx>=0.28

@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aether — UI Reference Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ===== Aether Design Tokens ===== */
+    --bg-void:#0E1116;
+    --bg-panel:#161B24;
+    --bg-elevated:#1D2430;
+    --bg-elevated-hover:#242C3A;
+    --border-subtle: rgba(232,236,242,0.08);
+    --border-strong: rgba(232,236,242,0.16);
+
+    --text-primary:#E8ECF2;
+    --text-secondary:#8B95A6;
+    --text-faint:#5C6577;
+
+    --aether-teal:#4FD1C5;
+    --aether-violet:#9B7EDE;
+    --aether-gradient: linear-gradient(135deg, var(--aether-teal), var(--aether-violet));
+
+    --tier-lite:#E0A458;
+    --tier-balanced:#4FD1C5;
+    --tier-performance:#9B7EDE;
+
+    --danger:#E8735C;
+    --success:#6FCF97;
+    --coral:#FF9376;
+    --sunbeam:#F2C078;
+    --bubblegum:#F2A6D4;
+
+    /* the four "sub-agent" hues -- one per satellite orb, always in this order */
+    --agent-1: var(--aether-teal);
+    --agent-2: var(--aether-violet);
+    --agent-3: var(--sunbeam);
+    --agent-4: var(--coral);
+
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+
+    --radius-sm:8px;
+    --radius-md:14px;
+    --radius-lg:20px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg-void);
+    color:var(--text-primary);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+
+  /* subtle ambient background texture — the "atmosphere" of Aether */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background:
+      radial-gradient(ellipse 700px 500px at 15% 0%, rgba(79,209,197,0.07), transparent 60%),
+      radial-gradient(ellipse 800px 600px at 100% 100%, rgba(155,126,222,0.07), transparent 60%),
+      radial-gradient(ellipse 500px 400px at 70% 15%, rgba(242,192,120,0.045), transparent 55%);
+    pointer-events:none;
+    z-index:0;
+  }
+  /* two slow-drifting blobs -- the bit of "pyaar" that keeps the void from feeling cold */
+  .blob{
+    position:fixed; border-radius:50%; filter:blur(60px);
+    pointer-events:none; z-index:0; opacity:.5;
+    animation: drift 22s ease-in-out infinite;
+  }
+  .blob.b1{ width:260px; height:260px; top:-60px; left:8%; background:radial-gradient(circle, rgba(79,209,197,.20), transparent 70%); }
+  .blob.b2{ width:320px; height:320px; bottom:-100px; right:6%; background:radial-gradient(circle, rgba(155,126,222,.18), transparent 70%); animation-delay:-9s; animation-duration:26s; }
+  @keyframes drift{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    50%{ transform:translate(18px,-14px) scale(1.08); }
+  }
+  @media (prefers-reduced-motion: reduce){ .blob{ animation:none; } }
+
+  .app{
+    position:relative;
+    z-index:1;
+    display:grid;
+    grid-template-columns: 76px 1fr 340px;
+    grid-template-rows: 60px 1fr 84px;
+    grid-template-areas:
+      "rail topbar topbar"
+      "rail main   side"
+      "rail input  side";
+    height:100vh;
+  }
+
+  /* ===================== LEFT RAIL ===================== */
+  .rail{
+    grid-area:rail;
+    background:var(--bg-panel);
+    border-right:1px solid var(--border-subtle);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:18px 0;
+    gap:6px;
+  }
+  .rail-logo{
+    width:38px;height:38px;border-radius:11px;
+    background:var(--aether-gradient);
+    margin-bottom:22px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display); font-weight:700; font-size:16px; color:#0E1116;
+  }
+  .rail-item{
+    width:46px;height:46px;border-radius:var(--radius-sm);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text-secondary);
+    cursor:pointer;
+    position:relative;
+    transition:background .15s ease, color .15s ease;
+  }
+  .rail-item:hover{ background:var(--bg-elevated); color:var(--text-primary); }
+  .rail-item.active{ background:var(--bg-elevated); color:var(--aether-teal); }
+  .rail-item.active::before{
+    content:"";
+    position:absolute; left:-14px; top:50%; transform:translateY(-50%);
+    width:3px; height:20px; border-radius:3px;
+    background:var(--aether-gradient);
+  }
+  .rail-item svg{ width:20px; height:20px; }
+  .rail-spacer{ flex:1; }
+  .rail-badge{
+    position:absolute; top:2px; right:2px;
+    min-width:16px; height:16px; padding:0 3px;
+    border-radius:999px; background:var(--aether-gradient);
+    color:#0E1116; font-family:var(--font-mono); font-size:9.5px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 2px var(--bg-panel);
+  }
+
+  /* ===================== TOP BAR ===================== */
+  .topbar{
+    grid-area:topbar;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 24px;
+    border-bottom:1px solid var(--border-subtle);
+    background:rgba(22,27,36,0.6);
+    backdrop-filter:blur(8px);
+  }
+  .topbar-left{ display:flex; align-items:center; gap:14px; }
+  .brand{ font-family:var(--font-display); font-weight:600; font-size:17px; letter-spacing:0.2px; }
+  .brand span{ color:var(--text-secondary); font-weight:400; font-size:13px; margin-left:8px;}
+  .brand .sparkle{
+    display:inline-block; margin-right:2px; font-size:13px;
+    color:var(--aether-teal); animation:twinkle 2.6s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{ opacity:.5; transform:scale(0.85) rotate(0deg); }
+    50%{ opacity:1; transform:scale(1.15) rotate(12deg); }
+  }
+
+  .tier-pill{
+    display:flex; align-items:center; gap:7px;
+    padding:6px 12px 6px 8px;
+    border-radius:999px;
+    background:var(--bg-elevated);
+    border:1px solid var(--border-subtle);
+    font-size:12.5px; font-weight:500;
+    cursor:default;
+  }
+  .tier-dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--tier-performance);
+    box-shadow:0 0 8px var(--tier-performance);
+    animation:pulse-dot 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse-dot{
+    0%,100%{ opacity:1; transform:scale(1);}
+    50%{ opacity:.55; transform:scale(0.8);}
+  }
+
+  .topbar-right{ display:flex; align-items:center; gap:18px; }
+  .resource-mini{ display:flex; align-items:center; gap:10px; font-size:12px; color:var(--text-secondary); font-family:var(--font-mono); }
+  .meter{ width:54px; height:5px; border-radius:3px; background:var(--bg-elevated); overflow:hidden; }
+  .meter-fill{ height:100%; border-radius:3px; }
+  .cost-chip{
+    font-family:var(--font-mono); font-size:12px; color:var(--text-secondary);
+    padding:5px 10px; border-radius:8px; border:1px solid var(--border-subtle);
+  }
+
+  /* ===================== MAIN CHAT AREA ===================== */
+  .main{
+    grid-area:main;
+    overflow-y:auto;
+    padding:28px 32px;
+    display:flex; flex-direction:column; gap:18px;
+  }
+
+  .msg{ display:flex; gap:14px; max-width:640px; }
+  .msg.user{ align-self:flex-end; flex-direction:row-reverse; }
+  .avatar{
+    width:30px;height:30px;border-radius:9px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px; font-weight:600; font-family:var(--font-display);
+  }
+  .avatar.aether{ background:var(--aether-gradient); color:#0E1116; }
+  .avatar.user{ background:var(--bg-elevated); color:var(--text-secondary); border:1px solid var(--border-subtle); }
+
+  .bubble{
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:var(--radius-md);
+    padding:13px 16px;
+    font-size:14.5px; line-height:1.55;
+    color:var(--text-primary);
+  }
+  .msg.user .bubble{ background:var(--bg-elevated); }
+
+  .tool-card{
+    margin-top:8px;
+    border:1px solid var(--border-subtle);
+    border-radius:var(--radius-sm);
+    background:var(--bg-elevated);
+    padding:12px 14px;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+  }
+  .tool-card .tool-head{
+    display:flex; align-items:center; gap:8px; margin-bottom:6px;
+    color:var(--text-secondary); font-family:var(--font-body); font-size:12px;
+  }
+  .tool-card .tool-head .dot{ width:6px;height:6px;border-radius:50%; background:var(--success);}
+  .tool-card code{ color:var(--aether-teal); }
+
+  .swimlane{
+    margin-top:10px;
+    border:1px solid var(--border-subtle);
+    border-radius:var(--radius-md);
+    background:var(--bg-elevated);
+    padding:13px 15px;
+  }
+  .swimlane-head{
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; color:var(--text-secondary); margin-bottom:11px;
+  }
+  .swimlane-head svg{ width:14px;height:14px; color:var(--aether-violet); flex-shrink:0; }
+  .agent-chip{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 10px; border-radius:10px;
+    background:var(--bg-panel); border:1px solid var(--border-subtle);
+    margin-bottom:7px;
+  }
+  .agent-chip:last-child{ margin-bottom:0; }
+  .agent-dot{
+    width:9px; height:9px; border-radius:50%; flex-shrink:0;
+    background:currentColor; box-shadow:0 0 7px currentColor;
+  }
+  .agent-chip.running .agent-dot{ animation:pulse-dot 1.4s ease-in-out infinite; }
+  .agent-chip .agent-name{ font-size:12.5px; font-weight:500; flex:1; color:var(--text-primary); }
+  .agent-chip .agent-state{
+    font-family:var(--font-mono); font-size:10px; font-weight:600;
+    padding:3px 8px; border-radius:999px; letter-spacing:.02em;
+  }
+  .agent-chip.running .agent-state{ background:rgba(79,209,197,0.15); color:var(--aether-teal); }
+  .agent-chip.done .agent-state{ background:rgba(111,207,151,0.15); color:var(--success); }
+  .agent-chip.queued .agent-state{ background:rgba(139,149,166,0.12); color:var(--text-faint); }
+
+  /* ----- voice picker card -- pick a "pyari si" TTS voice ----- */
+  .voice-picker{
+    margin-top:10px; display:flex; flex-direction:column; gap:8px;
+  }
+  .voice-card{
+    display:flex; align-items:center; gap:11px;
+    padding:10px 12px; border-radius:var(--radius-sm);
+    background:var(--bg-elevated); border:1px solid var(--border-subtle);
+    transition:border-color .15s ease;
+  }
+  .voice-card.selected{ border-color:var(--aether-teal); background:rgba(79,209,197,0.06); }
+  .voice-avatar{
+    width:34px; height:34px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-weight:700; font-size:13px; color:#0E1116;
+  }
+  .voice-info{ flex:1; min-width:0; }
+  .voice-info .voice-name{ font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px; }
+  .voice-info .voice-name .badge-offline{
+    font-family:var(--font-mono); font-size:9px; font-weight:600; letter-spacing:.02em;
+    padding:1px 6px; border-radius:999px; background:rgba(111,207,151,0.15); color:var(--success);
+  }
+  .voice-info .voice-style{ font-size:11.5px; color:var(--text-secondary); margin-top:1px; }
+  .voice-actions{ display:flex; align-items:center; gap:6px; flex-shrink:0; }
+  .voice-btn{
+    width:28px; height:28px; border-radius:50%; border:1px solid var(--border-subtle);
+    background:var(--bg-panel); color:var(--text-secondary); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .voice-btn svg{ width:13px; height:13px; }
+  .voice-card.selected .voice-btn.select-btn{ background:var(--aether-gradient); color:#0E1116; border:none; }
+
+  /* ----- mic listening / Aether speaking states ----- */
+  .mic-btn.listening{
+    animation:mic-listen 1.1s ease-in-out infinite;
+    box-shadow:0 0 0 0 rgba(232,115,92,0.4);
+  }
+  @keyframes mic-listen{
+    0%,100%{ box-shadow:0 0 0 0 rgba(232,115,92,0.35); }
+    50%{ box-shadow:0 0 0 10px rgba(232,115,92,0); }
+  }
+  .listening-hint{
+    display:flex; align-items:center; gap:6px;
+    font-size:12px; color:var(--danger); font-family:var(--font-mono);
+    white-space:nowrap;
+  }
+  .listening-hint .wave{ display:flex; align-items:flex-end; gap:2px; height:12px; }
+  .listening-hint .wave span{
+    width:2.5px; background:var(--danger); border-radius:2px;
+    animation:wave-bounce 0.9s ease-in-out infinite;
+  }
+  .listening-hint .wave span:nth-child(1){ height:5px; animation-delay:0s; }
+  .listening-hint .wave span:nth-child(2){ height:11px; animation-delay:.15s; }
+  .listening-hint .wave span:nth-child(3){ height:7px; animation-delay:.3s; }
+  @keyframes wave-bounce{ 0%,100%{ transform:scaleY(0.6); } 50%{ transform:scaleY(1.3); } }
+
+  .speaking-tag{
+    display:inline-flex; align-items:center; gap:5px;
+    font-family:var(--font-mono); font-size:10.5px; color:var(--aether-teal);
+    margin-left:8px;
+  }
+  .speaking-tag .wave{ display:flex; align-items:flex-end; gap:2px; height:9px; }
+  .speaking-tag .wave span{
+    width:2px; background:var(--aether-teal); border-radius:2px;
+    animation:wave-bounce 0.8s ease-in-out infinite;
+  }
+  .speaking-tag .wave span:nth-child(2){ animation-delay:.2s; }
+  .speaking-tag .wave span:nth-child(3){ animation-delay:.4s; }
+
+  .confirm-card{
+    margin-top:10px;
+    border:1px solid rgba(232,115,92,0.35);
+    background:rgba(232,115,92,0.08);
+    border-radius:var(--radius-sm);
+    padding:13px 15px;
+  }
+  .confirm-card .confirm-title{ display:flex; align-items:center; gap:8px; font-weight:600; font-size:13.5px; color:var(--danger); margin-bottom:6px;}
+  .confirm-card p{ margin:0 0 10px 0; font-size:13px; color:var(--text-secondary); }
+  .confirm-actions{ display:flex; gap:8px; }
+  .btn{
+    font-family:var(--font-body); font-size:12.5px; font-weight:600;
+    padding:7px 14px; border-radius:8px; border:none; cursor:pointer;
+  }
+  .btn-approve{ background:var(--danger); color:#1a0e0b; }
+  .btn-decline{ background:transparent; color:var(--text-secondary); border:1px solid var(--border-strong); }
+
+  /* ===================== INPUT BAR ===================== */
+  .input-bar{
+    grid-area:input;
+    display:flex; align-items:center; gap:12px;
+    padding:0 32px;
+    border-top:1px solid var(--border-subtle);
+  }
+  .mic-btn{
+    width:42px;height:42px;border-radius:50%;
+    background:var(--aether-gradient);
+    border:none; cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    box-shadow:0 0 0 0 rgba(79,209,197,0.4);
+    animation:mic-breathe 3s ease-in-out infinite;
+  }
+  @keyframes mic-breathe{
+    0%,100%{ box-shadow:0 0 0 0 rgba(79,209,197,0.25); }
+    50%{ box-shadow:0 0 0 8px rgba(79,209,197,0); }
+  }
+  .mic-btn svg{ width:18px;height:18px; color:#0E1116; }
+
+  .text-input{
+    flex:1; height:44px;
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:var(--radius-md);
+    padding:0 16px;
+    color:var(--text-primary);
+    font-family:var(--font-body); font-size:14px;
+    outline:none;
+  }
+  .text-input:focus{ border-color:var(--aether-teal); box-shadow:0 0 0 3px rgba(79,209,197,0.15); }
+  .hotkey-hint{ font-family:var(--font-mono); font-size:11px; color:var(--text-faint); white-space:nowrap; }
+
+  /* ===================== RIGHT SIDE PANEL ===================== */
+  .side{
+    grid-area:side;
+    border-left:1px solid var(--border-subtle);
+    background:var(--bg-panel);
+    display:flex; flex-direction:column;
+    overflow:hidden;
+  }
+
+  .core-wrap{
+    padding:26px 20px 18px;
+    display:flex; flex-direction:column; align-items:center;
+    border-bottom:1px solid var(--border-subtle);
+  }
+  .core-orb{
+    width:120px; height:120px; border-radius:50%;
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:14px;
+  }
+  .core-ring{
+    position:absolute; inset:0; border-radius:50%;
+    border:1.5px solid transparent;
+    background: conic-gradient(from 0deg, var(--aether-teal), var(--aether-violet), var(--aether-teal)) border-box;
+    -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    animation: spin 6s linear infinite;
+    opacity:.7;
+  }
+  .core-ring.r2{ inset:14px; animation-duration:9s; animation-direction:reverse; opacity:.45;}
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+  .core-glow{
+    width:64px;height:64px;border-radius:50%;
+    background:var(--aether-gradient);
+    filter:blur(1px);
+    animation:breathe 3.2s ease-in-out infinite;
+  }
+  @keyframes breathe{
+    0%,100%{ transform:scale(0.9); opacity:.85; }
+    50%{ transform:scale(1.05); opacity:1; }
+  }
+  .core-state{ font-family:var(--font-mono); font-size:12px; color:var(--text-secondary); text-align:center; }
+  .core-state b{ color:var(--aether-teal); font-weight:500; }
+
+  /* ----- sub-agent satellites, orbiting the core while they work ----- */
+  .core-orbit{ position:relative; width:170px; height:170px; display:flex; align-items:center; justify-content:center; }
+  .core-orbit .core-orb{ margin-bottom:0; }
+  .orbit-path{
+    position:absolute; inset:0; border-radius:50%;
+    border:1px dashed var(--border-subtle);
+  }
+  .orbit-node{
+    position:absolute; width:24px; height:24px; border-radius:50%;
+    background:var(--bg-elevated); border:2px solid currentColor;
+    box-shadow:0 0 9px currentColor;
+    display:flex; align-items:center; justify-content:center;
+    animation: orbit-pulse 2.4s ease-in-out infinite;
+    cursor:default;
+  }
+  .orbit-node .orbit-dot{ width:6px; height:6px; border-radius:50%; background:currentColor; }
+  .orbit-node.n1{ top:2px; left:50%; margin-left:-12px; }
+  .orbit-node.n2{ bottom:22px; left:4px; }
+  .orbit-node.n3{ bottom:22px; right:4px; }
+  @keyframes orbit-pulse{
+    0%,100%{ transform:scale(0.92); opacity:.8; }
+    50%{ transform:scale(1.08); opacity:1; }
+  }
+  .orbit-legend{ display:flex; flex-direction:column; gap:6px; margin-top:14px; width:100%; }
+  .orbit-legend-item{
+    display:flex; align-items:center; gap:8px;
+    font-size:11.5px; color:var(--text-secondary);
+  }
+  .orbit-legend-item .orbit-dot{ width:7px; height:7px; border-radius:50%; background:currentColor; box-shadow:0 0 6px currentColor; flex-shrink:0; }
+
+  .side-section{ padding:16px 20px; border-bottom:1px solid var(--border-subtle); }
+  .side-section h4{
+    margin:0 0 12px 0; font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--text-faint); font-weight:600;
+  }
+
+  .log-item{
+    display:flex; gap:9px; font-size:12px; font-family:var(--font-mono);
+    color:var(--text-secondary); margin-bottom:9px; line-height:1.4;
+  }
+  .log-item .tag{
+    flex-shrink:0; padding:1px 6px; border-radius:5px; font-size:10px;
+    height:fit-content;
+  }
+  .tag.call{ background:rgba(79,209,197,0.15); color:var(--aether-teal); }
+  .tag.result{ background:rgba(111,207,151,0.15); color:var(--success); }
+  .tag.wait{ background:rgba(224,164,88,0.15); color:var(--tier-lite); }
+
+  .cam-preview{
+    border-radius:var(--radius-sm);
+    border:1px solid var(--border-subtle);
+    aspect-ratio:16/10;
+    background:var(--bg-elevated);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--text-faint); font-size:12px;
+    position:relative;
+    overflow:hidden;
+  }
+  .cam-preview.active{ border-color: var(--danger); }
+  .cam-preview .rec-dot{
+    position:absolute; top:8px; left:8px;
+    display:flex; align-items:center; gap:5px;
+    font-size:10px; font-family:var(--font-mono); color:var(--danger);
+  }
+  .cam-preview .rec-dot::before{
+    content:""; width:6px;height:6px;border-radius:50%; background:var(--danger);
+    animation:pulse-dot 1.2s ease-in-out infinite;
+  }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:var(--bg-elevated-hover); border-radius:8px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+
+<div class="app">
+
+  <!-- LEFT RAIL -->
+  <nav class="rail">
+    <div class="rail-logo">Æ</div>
+    <div class="rail-item active" title="Chat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    </div>
+    <div class="rail-item" title="Activity Log">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 8v4l3 3M12 3a9 9 0 1 0 9 9"/></svg>
+    </div>
+    <div class="rail-item" title="Memory">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2a5 5 0 0 0-5 5v2a5 5 0 0 0-2 4v2a5 5 0 0 0 5 5h8a5 5 0 0 0 5-5v-2a5 5 0 0 0-2-4V7a5 5 0 0 0-5-5z"/></svg>
+    </div>
+    <div class="rail-item" title="Plugins">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 4v4h-4V4H6v4H4v4h2v2H4v4h4v-2h4v2h4v-4h2v-4h-2V8h2V4z"/></svg>
+    </div>
+    <div class="rail-item" title="Sub-Agents">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="5" r="2.2"/><circle cx="5" cy="19" r="2.2"/><circle cx="19" cy="19" r="2.2"/><path d="M12 7.2v4.3M12 11.5 6.3 17M12 11.5l5.7 5.5"/></svg>
+      <span class="rail-badge">3</span>
+    </div>
+    <div class="rail-item" title="Models">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+    </div>
+    <div class="rail-spacer"></div>
+    <div class="rail-item" title="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </div>
+  </nav>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="brand"><span class="sparkle">✦</span> Aether <span>· desktop assistant</span></span>
+    </div>
+    <div class="topbar-right">
+      <div class="tier-pill"><span class="tier-dot"></span> Performance tier</div>
+      <div class="resource-mini">
+        CPU <div class="meter"><div class="meter-fill" style="width:38%; background:var(--tier-performance);"></div></div>
+        RAM <div class="meter"><div class="meter-fill" style="width:57%; background:var(--tier-performance);"></div></div>
+      </div>
+      <div class="cost-chip">session ≈ $0.04</div>
+    </div>
+  </header>
+
+  <!-- MAIN CHAT -->
+  <main class="main">
+
+    <div class="msg user">
+      <div class="avatar user">You</div>
+      <div class="bubble">Organize my Downloads folder and tell me what's on my second monitor.</div>
+    </div>
+
+    <div class="msg">
+      <div class="avatar aether">Æ</div>
+      <div class="bubble">
+        That's two separate things, so I'm splitting this into 2 sub-agents running side by side instead of doing them one after another.
+        <div class="swimlane">
+          <div class="swimlane-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="5" r="2.2"/><circle cx="5" cy="19" r="2.2"/><circle cx="19" cy="19" r="2.2"/><path d="M12 7.2v4.3M12 11.5 6.3 17M12 11.5l5.7 5.5"/></svg>
+            Sub-agents · running in parallel
+          </div>
+          <div class="agent-chip running" style="color:var(--agent-1)">
+            <span class="agent-dot"></span>
+            <span class="agent-name">Organize Downloads</span>
+            <span class="agent-state">needs OK</span>
+          </div>
+          <div class="agent-chip running" style="color:var(--agent-2)">
+            <span class="agent-dot"></span>
+            <span class="agent-name">Describe second screen</span>
+            <span class="agent-state">running</span>
+          </div>
+        </div>
+        <div class="confirm-card">
+          <div class="confirm-title">⚠ Confirmation needed</div>
+          <p><code style="color:var(--aether-teal)">batch_organize_by_type</code> will move files inside <b>C:\Users\you\Downloads</b> into subfolders (PDFs, Images, Videos…).</p>
+          <div class="confirm-actions">
+            <button class="btn btn-approve">Approve</button>
+            <button class="btn btn-decline">Decline</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg">
+      <div class="avatar aether">Æ</div>
+      <div class="bubble">
+        Both sub-agents are done:
+        <div class="swimlane">
+          <div class="agent-chip done" style="color:var(--agent-1)">
+            <span class="agent-dot"></span>
+            <span class="agent-name">Organize Downloads</span>
+            <span class="agent-state">done · 1.8s</span>
+          </div>
+          <div class="agent-chip done" style="color:var(--agent-2)">
+            <span class="agent-dot"></span>
+            <span class="agent-name">Describe second screen</span>
+            <span class="agent-state">done · 1.2s</span>
+          </div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-head"><span class="dot"></span> merged result</div>
+          Moved 34 files into 5 folders. Your second monitor shows a Chrome window with a Google Sheets budget tracker open, and a Slack window with 3 unread messages in #design.
+        </div>
+      </div>
+    </div>
+
+    <div class="msg user">
+      <div class="avatar user">You</div>
+      <div class="bubble">koi achi si voice suna do, ek pyari si voice chun leta hoon</div>
+    </div>
+
+    <div class="msg">
+      <div class="avatar aether">Æ</div>
+      <div class="bubble">
+        Sure — here are the offline voices, tap ▶ to preview one, then pick your favorite:
+        <div class="voice-picker">
+          <div class="voice-card selected">
+            <div class="voice-avatar" style="background:var(--agent-1)">A</div>
+            <div class="voice-info">
+              <div class="voice-name">Amara <span class="badge-offline">offline</span></div>
+              <div class="voice-style">warm, friendly, a little playful</div>
+            </div>
+            <div class="voice-actions">
+              <button class="voice-btn" title="Preview"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+              <button class="voice-btn select-btn" title="Selected"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7"/></svg></button>
+            </div>
+          </div>
+          <div class="voice-card">
+            <div class="voice-avatar" style="background:var(--agent-2)">R</div>
+            <div class="voice-info">
+              <div class="voice-name">Rohan <span class="badge-offline">offline</span></div>
+              <div class="voice-style">calm, steady, easy for long sessions</div>
+            </div>
+            <div class="voice-actions">
+              <button class="voice-btn" title="Preview"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+              <button class="voice-btn select-btn" title="Select"></button>
+            </div>
+          </div>
+          <div class="voice-card">
+            <div class="voice-avatar" style="background:var(--agent-3)">N</div>
+            <div class="voice-info">
+              <div class="voice-name">Nadia <span class="badge-offline">offline</span></div>
+              <div class="voice-style">soft-spoken, gentle, good at night</div>
+            </div>
+            <div class="voice-actions">
+              <button class="voice-btn" title="Preview"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+              <button class="voice-btn select-btn" title="Select"></button>
+            </div>
+          </div>
+          <div class="voice-card">
+            <div class="voice-avatar" style="background:var(--agent-4)">Z</div>
+            <div class="voice-info">
+              <div class="voice-name">Zeke <span class="badge-offline">offline</span></div>
+              <div class="voice-style">upbeat, energetic, a bit cheeky</div>
+            </div>
+            <div class="voice-actions">
+              <button class="voice-btn" title="Preview"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+              <button class="voice-btn select-btn" title="Select"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg">
+      <div class="avatar aether">Æ</div>
+      <div class="bubble">
+        Amara it is<span class="speaking-tag"><span class="wave"><span></span><span></span><span></span></span> speaking</span> — every reply from here on out gets read aloud in this voice, and I'll still show the text too.
+      </div>
+    </div>
+
+  </main>
+
+  <!-- INPUT BAR -->
+  <div class="input-bar">
+    <button class="mic-btn listening">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+    </button>
+    <input class="text-input" type="text" placeholder="Message Aether, or say “Hey Aether”…" />
+    <span class="listening-hint"><span class="wave"><span></span><span></span><span></span></span> listening</span>
+    <span class="hotkey-hint">Ctrl+Alt+Space</span>
+  </div>
+
+  <!-- RIGHT SIDE PANEL -->
+  <aside class="side">
+    <div class="core-wrap">
+      <div class="core-orbit">
+        <div class="orbit-path"></div>
+        <div class="core-orb">
+          <div class="core-ring"></div>
+          <div class="core-ring r2"></div>
+          <div class="core-glow"></div>
+        </div>
+        <div class="orbit-node n1" style="color:var(--agent-1)" title="Organize Downloads · done"><span class="orbit-dot"></span></div>
+        <div class="orbit-node n2" style="color:var(--agent-2)" title="Describe second screen · running"><span class="orbit-dot"></span></div>
+        <div class="orbit-node n3" style="color:var(--agent-3)" title="Check disk space · queued"><span class="orbit-dot"></span></div>
+      </div>
+      <div class="core-state">2 sub-agents active · <b>Performance</b> mode</div>
+      <div class="orbit-legend">
+        <div class="orbit-legend-item" style="color:var(--agent-1)"><span class="orbit-dot"></span> Organize Downloads — done</div>
+        <div class="orbit-legend-item" style="color:var(--agent-2)"><span class="orbit-dot"></span> Describe second screen — running</div>
+        <div class="orbit-legend-item" style="color:var(--agent-3)"><span class="orbit-dot"></span> Check disk space — queued</div>
+      </div>
+    </div>
+
+    <div class="side-section">
+      <h4>Live Activity</h4>
+      <div class="log-item"><span class="tag call">call</span> search_files(pattern="*.pdf")</div>
+      <div class="log-item"><span class="tag wait">wait</span> confirm batch_organize_by_type</div>
+      <div class="log-item"><span class="tag result">done</span> moved 34 files → 5 folders</div>
+      <div class="log-item"><span class="tag call">call</span> describe_screen_view()</div>
+      <div class="log-item"><span class="tag result">done</span> screen described (1.2s)</div>
+    </div>
+
+    <div class="side-section">
+      <h4>Camera</h4>
+      <div class="cam-preview">
+        <span>◡ ‿ ◡ &nbsp;Camera Vision is resting</span>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+</body>
+</html>

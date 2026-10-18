@@ -1,0 +1,36 @@
+psutil>=5.9
+nvidia-ml-py>=12.0
+requests>=2.31
+PyYAML>=6.0
+pywin32>=306; sys_platform == 'win32'
+win10toast>=0.9; sys_platform == 'win32'
+pycaw>=20230407; sys_platform == 'win32'
+comtypes>=1.2; sys_platform == 'win32'
+screen-brightness-control>=0.16; sys_platform == 'win32'
+keyring>=24.0
+
+# Camera & Screen Vision plugin (Module 7)
+opencv-python>=4.9
+mss>=9.0
+Pillow>=10.2
+
+# Voice plugin (Module 9) -- offline STT + selectable TTS voices
+faster-whisper>=1.0
+piper-tts>=1.2
+sounddevice>=0.4
+soundfile>=0.12
+openwakeword>=0.4
+keyboard>=0.13; sys_platform == 'win32'
+
+# Local API bridge + persistence/automation plugins
+fastapi>=0.116
+uvicorn[standard]>=0.35
+pydantic>=2.11
+playwright>=1.53
+chromadb>=1.0
+tree-sitter-language-pack>=0.9
+
+# Development, CI, and Windows sidecar packaging
+pytest>=8.3
+pyinstaller>=6.14
+httpx>=0.28

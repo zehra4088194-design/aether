@@ -1,0 +1,8 @@
+name = "aether-license"
+main = "src/index.ts"
+compatibility_date = "2026-08-06"
+
+[[d1_databases]]
+binding = "LICENSE_DB"
+database_name = "aether-license-db"
+database_id = "REPLACE_WITH_NEW_CLOUDFLARE_D1_DATABASE_ID"

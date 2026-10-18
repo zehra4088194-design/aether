@@ -1,0 +1,40 @@
+name: Aether CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  python-tests:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install foundation and test dependencies
+        run: python -m pip install -r requirements-core.txt
+      - name: Run tests
+        run: python -m pytest
+
+  desktop-build-check:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Type-check and build frontend
+        run: npm run build
+      - name: Provide check-only sidecar placeholder
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path src-tauri/binaries -Force | Out-Null
+          New-Item -ItemType File -Path src-tauri/binaries/aether-backend-x86_64-pc-windows-msvc.exe -Force | Out-Null
+      - name: Check Tauri host
+        run: cargo check --locked --manifest-path src-tauri/Cargo.toml
